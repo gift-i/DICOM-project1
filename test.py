@@ -5,9 +5,11 @@ import pydicom
 %matplotlib ipympl
 
 import imageio
-def get_vol_data(file_directory):  # define function to get data from dicom file
-    vol_data = imageio.volread(file_directory)  # read dicom file
-    return vol_data  # return dicom data
+def get_vol_data(file_directory):  
+    '''a function to get the 3D pixel data from a DICOM file
+    '''
+    vol_data = imageio.volread(file_directory) 
+    return vol_data
 
 def slices(number_of_slice, slice_type, file_directory):
     '''returns the information of the specified slice, to be plotted
@@ -24,7 +26,7 @@ def slices(number_of_slice, slice_type, file_directory):
     else:
         raise ValueError("Please choose from 'axial', 'coronal', or 'sagittal', and a slice number must be between 0 and 255")
 
-file_directory = 
+file_directory = # needs to be a r'' string
 
 axial_slice = slices(90, 'axial', file_directory)
 saggital_slice = slices(90, 'sagittal', file_directory)
