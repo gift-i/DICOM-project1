@@ -5,44 +5,48 @@ import pydicom
 %matplotlib ipympl
 
 import imageio
-def get_vol_data(directory):  # define function to get data from dicom file
-    vol_data = imageio.volread(r'directory')  # read dicom file
+def get_vol_data(file_directory):  # define function to get data from dicom file
+    vol_data = imageio.volread(file_directory)  # read dicom file
     return vol_data  # return dicom data
 
-def slices(number_of_slice, slice_type, directory):
+def slices(number_of_slice, slice_type, file_directory):
     '''returns the information of the specified slice, to be plotted
     slice_type are defined as 'axial', 'coronal', and 'sagittal' 
     number_of_slice defines the specific slice to be returned
     '''
-    vol = get_vol_data(directory)
+    vol = get_vol_data(file_directory)
     if slice_type == 'axial':
         return vol[number_of_slice,:,:]
     elif slice_type == 'coronal':
         return vol[:,number_of_slice,:]
-    elif slice_type == 'saggital':
+    elif slice_type == 'sagittal':
         return vol[:,:,number_of_slice]
     else:
-        raise ValueError("Please choose from 'axial', 'coronal', or 'saggital', and a slice number must be between 0 and 255")
+        raise ValueError("Please choose from 'axial', 'coronal', or 'sagittal', and a slice number must be between 0 and 255")
 
-axial_slice = slices(90, 'axial', directory)
-saggital_slice = slices(90, 'saggital', directory)
-coronal_slice = slices(90, 'coronal', directory)
+file_directory = 
 
-plt.close('all')
-plt.figure(figsize=(2,2))
+axial_slice = slices(90, 'axial', file_directory)
+saggital_slice = slices(90, 'sagittal', file_directory)
+coronal_slice = slices(90, 'coronal', file_directory)
+
+
+# plotting the MRI images in the plane
+plt.close('all') # just to close all the other graphs before this run
+plt.figure(figsize=(2,2)) # small because of preference, I used %matplotlib ipympl to expand the graphs
 plt.imshow(axial_slice, cmap='gray')
 plt.title('Axial slice')
 plt.axis('off')
 plt.show()
 
 plt.figure(figsize=(2,2))
-plt.imshow(coronal_slice, cmap='gray') # print pixel data of dicom file
+plt.imshow(coronal_slice, cmap='gray')
 plt.title('Coronal Slice')
 plt.axis('off')
 plt.show()
 
 plt.figure(figsize=(2,2))
-plt.imshow(sagittal_slice, cmap='gray') # print pixel data of dicom file
+plt.imshow(sagittal_slice, cmap='gray') 
 plt.title('Sagittal Slice')
 plt.axis('off')
 plt.show()
