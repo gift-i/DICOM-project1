@@ -5,16 +5,16 @@ import pydicom
 %matplotlib ipympl
 
 import imageio
-def get_vol_data(end_digits):  # define function to get data from dicom file
-    vol_data = imageio.volread(r"C:\Users\slaar\Desktop\project\HippocampalMRISlices\01\MR.1.2.246.352.221.{}.dcm".format(str(end_digits)))  # read dicom file
+def get_vol_data(directory):  # define function to get data from dicom file
+    vol_data = imageio.volread(r'directory')  # read dicom file
     return vol_data  # return dicom data
 
-def slices(number_of_slice, slice_type, end_digits):
+def slices(number_of_slice, slice_type, directory):
     '''returns the information of the specified slice, to be plotted
     slice_type are defined as 'axial', 'coronal', and 'sagittal' 
     number_of_slice defines the specific slice to be returned
     '''
-    vol = get_vol_data(end_digits)
+    vol = get_vol_data(directory)
     if slice_type == 'axial':
         return vol[number_of_slice,:,:]
     elif slice_type == 'coronal':
@@ -24,9 +24,9 @@ def slices(number_of_slice, slice_type, end_digits):
     else:
         raise ValueError("Please choose from 'axial', 'coronal', or 'saggital', and a slice number must be between 0 and 255")
 
-axial_slice = slices(90, 'axial', 551459698506200377412175303061706085291)
-saggital_slice = slices(90, 'saggital', 551459698506200377412175303061706085291)
-coronal_slice = slices(90, 'coronal', 551459698506200377412175303061706085291)
+axial_slice = slices(90, 'axial', directory)
+saggital_slice = slices(90, 'saggital', directory)
+coronal_slice = slices(90, 'coronal', directory)
 
 plt.close('all')
 plt.figure(figsize=(2,2))
