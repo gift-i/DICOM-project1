@@ -1,48 +1,65 @@
-### very slow slider
+#%%
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pydicom
-%matplotlib qt
 
+#%%
+# For the get vol data function would be
+def get_vol_data_pydicom(directory):
+    """
+    Extract a volume from a dictory with a dicom for each 
+    individual slice of the 3D scan
+    """    
+    # Init the dicoms variable 
+    dicoms = [] 
 
-def dictionary(directory):
-    '''returns a dictionary
-    key = order of the dicom file (integer starting from 0)
-    value = pixel data of the dicom file
-    '''
-    dicom_dict = {}
-    dicom_order = []
-    counter = 0
-    for entry in os.scandir(directory): # looping through all the files in the directory
-        if 'MR.1.2.246' in str(entry):
-            # order = int(str(entry)[30:37]) # was used previously as a 
-            ds = pydicom.dcmread(entry.path) # reading the dicom files
-            dicom_dict[counter] = ds.pixel_array # appending the empty dictionary
-            dicom_order.append(counter)
-        counter += 1
-    return dicom_order, dicom_dict
+    # Set up the paths to search 
+    dicom_names = os.listdir(directory)
+    
+    # Extract only dicoms of the right type 
+    for dicom_name in dicom_names:
+        dicom_path = os.path.join(directory, dicom_name)
+        ds = pydicom.dcmread(dicom_path)
+        
+        ds_type = ds.file_meta.MediaStorageSOPClassUID.name
+        if ds_type == 'MR Image Storage':
+            dicoms.append(ds)
+        else:
+            print(f"Skipping file: {dicom_name}")
+            print(f"DS Type: {ds_type}")
+    
+    dicoms = sorted(dicoms,key=lambda ds: float(ds.SliceLocation))
+    slices = [ds.pixel_array for ds in dicoms]
+    volume = np.stack(slices)
 
-directory = # the folder directory, i.e.: r'C:\Users\slaar\Desktop\project\HippocampalMRISlices\01'
-dicom_dict = dictionary(directory)[1]
-dicom_order = dictionary(directory)[0]
+    print(f"Found {len(slices)} slices")
+    return (volume)
 
+#%%
+root_directory = "HippocampalMRISlices"
+patient_folders = sorted(os.listdir(root_directory))
+patient_num = 1
+
+directory = os.path.join(root_directory, patient_folders[patient_num])
+
+volume = get_vol_data_pydicom(directory)
+#%%
 from matplotlib.widgets import Slider, Button
-import IPython.display as display 
 
 plt.close('all') # close previous plots
 fig, ax = plt.subplots() 
 plt.subplots_adjust(bottom=0.35) 
 ax_order = plt.axes([0.25, 0.1, 0.65, 0.03]) # to create space for the slider
-ax.imshow(dicom_dict[min(dicom_order)])
+ax.imshow(volume[0,:,:])
 
-order_slider = Slider(ax_order, 'Order', min(dicom_order), max(dicom_order), valinit=0, valstep=1, color='lightblue') # the slider
-
+num_slices = volume.shape[0]
+order_slider = Slider(ax_order, 'Order', 0, num_slices -1, valinit=0, valstep=1, color='lightblue') # the slider
 
 def update(val):
     '''update function'''
     ord = order_slider.val
-    ax.imshow(dicom_dict[ord])
+    ax.imshow(volume[ord, :,:])
     fig.canvas.draw_idle()
 
 order_slider.on_changed(update)
@@ -52,9 +69,9 @@ button = Button(ax_reset, 'Reset', hovercolor='0.975')
 
 
 def reset(event):
-  '''for reset button'''
+    '''for reset button'''
     order_slider.reset()
+  
 button.on_clicked(reset)
 
 plt.show()
-
