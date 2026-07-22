@@ -4,6 +4,8 @@ import pydicom
 #%matplotlib qt
 %matplotlib ipympl
 
+#new
+
 import imageio
 def get_vol_data(file_directory):  
     '''a function to get the 3D pixel data from a DICOM file
